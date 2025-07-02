@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Liên hệ hỗ trợ</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding-top: 80px;
+      background-color: #f4f6f8;
+    }
+    h2 { margin-bottom: 30px; }
+    .btn {
+      display: inline-block;
+      margin: 10px;
+      padding: 14px 28px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: bold;
+      color: #fff;
+      cursor: pointer;
+    }
+    .email { background-color: #007BFF; }
+    .sms { background-color: #28a745; }
+    .viber { background-color: #6f42c1; }
+    .btn:hover { opacity: 0.9; }
+  </style>
+</head>
+<body>
+
+  <h2>Chọn kênh liên hệ để được hỗ trợ</h2>
+
+  <button class="btn email" onclick="updateChannel('email')">Email</button>
+  <button class="btn sms" onclick="updateChannel('sms')">SMS</button>
+  <button class="btn viber" onclick="updateChannel('viber')">Viber</button>
+
+  <!-- ✅ Đặt script ở cuối body để đảm bảo các nút đã được render -->
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const email = "tbui@infobip.com"; // params.get("email")
+    const API_KEY = "App 82f35adf281bec2850f0c08bf98e90bb-ada258ae-4e71-4853-ba9a-25f3444267c2"; // 🔁 Thay bằng App Key thật
+    const API_BASE = "https://16jmn.api.infobip.com"; // 🔁 Hoặc endpoint cụ thể của bạn
+
+    async function updateChannel(channel) {
+      if (!email) {
+        alert("Không xác định được địa chỉ email người dùng.");
+        return;
+      }
+
+      try {
+        await fetch(`${API_BASE}/people/2/persons?identifier=${encodeURIComponent(email)}&type=EMAIL`, {
+          method: "PATCH",
+          headers: {
+            "Authorization": API_KEY,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            customAttributes: {
+              needSupport: true,
+              preferredContactChannel: channel,
+              lastContactTime: new Date().toISOString()
+            }
+          })
+        });
+      } catch (err) {
+        console.error("Lỗi cập nhật attribute:", err);
+      }
+
+      switch (channel) {
+        case "email":
+          window.location.href = "mailto:support@spaairlines.com?subject=Ho%20tro%20lich%20bay";
+          break;
+        case "sms":
+          window.location.href = "sms:+84901234567?body=Toi%20can%20ho%20tro%20lich%20bay";
+          break;
+        case "viber":
+          window.location.href = "viber://pa?text=Toi%20muon%20tu%20van%20lich%20bay";
+          break;
+      }
+    }
+  </script>
+
+</body>
+</html>
